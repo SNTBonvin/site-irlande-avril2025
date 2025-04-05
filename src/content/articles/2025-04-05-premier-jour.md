@@ -1,9 +1,7 @@
-// src/content/articles/2025-04-05-premier-jour.md
-
 ---
 title: "Premier jour à Dublin"
 pubDate: "2025-04-05"
-cover: "/images/dublin.jpg"
+cover: "https://www.brussels-charleroi-airport.com/sites/default/files/2021-06/Dublin.jpg"
 description: "Notre arrivée à Dublin sous un beau soleil"
 ---
 
