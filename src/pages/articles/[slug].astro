@@ -26,6 +26,8 @@ const returnLabels = [
   "🛤️ Return to the green road"
 ];
 const returnLabel = returnLabels[Math.floor(Math.random() * returnLabels.length)];
+const { Content } = await article.render();
+
 ---
 
 <Layout>
@@ -52,6 +54,7 @@ const returnLabel = returnLabels[Math.floor(Math.random() * returnLabels.length)
       />
     )}
 
-    <div innerHTML={article.body} />
+<Content />
+
   </article>
 </Layout>
