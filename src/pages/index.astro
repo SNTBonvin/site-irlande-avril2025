@@ -1,11 +1,26 @@
 ---
-import Welcome from '../components/Welcome.astro';
-import Layout from '../layouts/Layout.astro';
-
-// Welcome to Astro! Wondering what to do next? Check out the Astro documentation at https://docs.astro.build
-// Don't want to use any of this? Delete everything in this file, the `assets`, `components`, and `layouts` directories, and start fresh.
+// src/pages/index.astro
+import { getCollection } from 'astro:content'
+const articles = await getCollection('articles')
 ---
 
-<Layout>
-	<Welcome />
-</Layout>
+<html>
+  <head>
+    <title>Voyage en Irlande 2025</title>
+  </head>
+  <body class="bg-green-50 text-gray-800">
+    <h1 class="text-3xl text-center my-8">Carnet de voyage en Irlande 🇮🇪</h1>
+    
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 px-4">
+      {articles.map(article => (
+        <a href={`/articles/${article.slug}/`} class="block rounded-lg shadow hover:shadow-xl transition">
+          <img src={article.data.cover} alt={article.data.title} class="w-full h-48 object-cover rounded-t-lg" />
+          <div class="p-4 bg-white rounded-b-lg">
+            <h2 class="text-xl font-bold">{article.data.title}</h2>
+            <p class="text-sm text-gray-500">{article.data.pubDate}</p>
+          </div>
+        </a>
+      ))}
+    </div>
+  </body>
+</html>
