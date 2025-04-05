@@ -55,6 +55,100 @@ const { Content } = await article.render();
     )}
 
 <Content />
+<hr class="my-8" />
+<section id="comments" class="mt-8">
+  <h2 class="text-2xl font-semibold mb-4">💬 Vos commentaires</h2>
+
+  <!-- Formulaire -->
+  <form id="comment-form" class="mb-6 space-y-4">
+    <input
+      type="text"
+      id="comment-name"
+      placeholder="Votre prénom"
+      required
+      class="w-full border rounded px-4 py-2"
+    />
+    <textarea
+      id="comment-text"
+      rows="3"
+      placeholder="Votre commentaire"
+      required
+      class="w-full border rounded px-4 py-2"
+    ></textarea>
+    <button
+      type="submit"
+      class="px-4 py-2 bg-[#169B62] text-white rounded hover:bg-green-700 transition"
+    >
+      ✍️ Envoyer
+    </button>
+  </form>
+
+  <!-- Zone d'affichage -->
+  <ul id="comment-list" class="space-y-4"></ul>
+</section>
 
   </article>
 </Layout>
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const form = document.getElementById("comment-form");
+    const list = document.getElementById("comment-list");
+    const nameInput = document.getElementById("comment-name");
+    const textInput = document.getElementById("comment-text");
+
+    if (!form || !list) return;
+
+    const key = location.pathname + "_comments";
+
+    const emojis = ["☘️", "🍺", "🌦️", "🐑", "🏰", "🥔", "🎻", "🌈", "🧳", "📷"];
+
+    function timeAgo(dateString) {
+      const now = new Date();
+      const date = new Date(dateString);
+      const seconds = Math.floor((now - date) / 1000);
+      const minutes = Math.floor(seconds / 60);
+      const hours = Math.floor(minutes / 60);
+      const days = Math.floor(hours / 24);
+
+      if (days > 0) return `il y a ${days} jour${days > 1 ? "s" : ""}`;
+      if (hours > 0) return `il y a ${hours}h`;
+      if (minutes > 0) return `il y a ${minutes} min`;
+      return `à l’instant`;
+    }
+
+    function loadComments() {
+      const saved = JSON.parse(localStorage.getItem(key) || "[]");
+      list.innerHTML = "";
+
+      saved.forEach(({ name, text, date, emoji }) => {
+        const li = document.createElement("li");
+        li.className = "bg-gray-100 dark:bg-gray-700 p-4 rounded shadow";
+        li.innerHTML = `
+          <strong class="text-[#169B62]">${emoji || "☘️"} ${name}</strong>
+          <span class="text-sm text-gray-500 float-right">${timeAgo(date)}</span>
+          <p class="mt-2">${text}</p>
+        `;
+        list.appendChild(li);
+      });
+    }
+
+    form.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const name = nameInput.value.trim();
+      const text = textInput.value.trim();
+      if (!name || !text) return;
+
+      const emoji = emojis[Math.floor(Math.random() * emojis.length)];
+      const newComment = { name, text, date: new Date().toISOString(), emoji };
+      const existing = JSON.parse(localStorage.getItem(key) || "[]");
+      const updated = [...existing, newComment];
+      localStorage.setItem(key, JSON.stringify(updated));
+
+      nameInput.value = "";
+      textInput.value = "";
+      loadComments();
+    });
+
+    loadComments();
+  });
+</script>
