@@ -1,0 +1,22 @@
+---
+import { getEntryBySlug } from "astro:content";
+import Layout from "../../layouts/Layout.astro";
+
+const { slug } = Astro.params;
+const article = await getEntryBySlug("articles", slug);
+
+if (!article) {
+  throw new Error(`Article non trouvé : ${slug}`);
+}
+---
+
+<Layout>
+  <article class="prose prose-lg max-w-3xl mx-auto dark:prose-invert">
+    <h1>{article.data.title}</h1>
+    <p class="text-sm text-gray-500 mb-4">📅 {article.data.pubDate}</p>
+    {article.data.cover && (
+      <img src={article.data.cover} alt={article.data.title} class="rounded-xl my-4" />
+    )}
+    <div innerHTML={article.body} />
+  </article>
+</Layout>
