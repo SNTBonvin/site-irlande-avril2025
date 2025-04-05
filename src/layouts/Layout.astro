@@ -1,23 +1,78 @@
-<!doctype html>
-<html lang="en">
-	<head>
-		<meta charset="UTF-8" />
-		<meta name="viewport" content="width=device-width" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<link rel="stylesheet" href="/src/styles/global.css">
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro Basics</title>
-	</head>
-	<body>
-		<slot />
-	</body>
-</html>
+---
+import "../styles/global.css";
+---
 
-<style>
-	html,
-	body {
-		margin: 0;
-		width: 100%;
-		height: 100%;
-	}
-</style>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Voyage en Irlande 2025</title>
+
+    <!-- ⚡ Initialisation immédiate du thème (évite clignotement) -->
+    <script is:inline>
+      (() => {
+        const theme = localStorage.getItem('theme') ||
+          (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+        if (theme === 'dark') {
+          document.documentElement.classList.add('dark');
+        } else {
+          document.documentElement.classList.remove('dark');
+        }
+      })();
+    </script>
+  </head>
+
+  <body class="bg-[#eaf4ec] text-gray-800 font-sans transition-colors duration-300 dark:bg-gray-900 dark:text-white">
+    
+    <header class="bg-[#169B62] text-white py-6 px-6">
+      <div class="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center text-center gap-4">
+        <h1 class="text-4xl font-bold">🇮🇪 Carnet de voyage en Irlande 2025 🇮🇪</h1>
+        <button id="theme-toggle" class="flex items-center gap-2 px-4 py-2 bg-white text-[#169B62] font-semibold rounded shadow hover:bg-gray-100 transition cursor-pointer">
+          <span id="theme-icon">🌙</span>
+          <span id="theme-text">Activer le mode sombre</span>
+        </button>
+      </div>
+    </header>
+
+    <main class="p-6 max-w-6xl mx-auto">
+      <slot />
+    </main>
+
+    <footer class="bg-[#169B62] text-white text-center py-4 mt-8">
+      <p>&copy; 2025 - GoodWine en Irlande ☘️</p>
+    </footer>
+
+    <!-- 🌓 Script de bascule thème -->
+    <script>
+      window.addEventListener('DOMContentLoaded', () => {
+        const toggle = document.getElementById('theme-toggle');
+        const icon = document.getElementById('theme-icon');
+        const text = document.getElementById('theme-text');
+
+        function updateUI(theme) {
+          if (theme === 'dark') {
+            icon.textContent = '☀️';
+            text.textContent = 'Activer le mode clair';
+            document.documentElement.classList.add('dark');
+          } else {
+            icon.textContent = '🌙';
+            text.textContent = 'Activer le mode sombre';
+            document.documentElement.classList.remove('dark');
+          }
+        }
+
+        toggle.addEventListener('click', () => {
+          const isDark = document.documentElement.classList.toggle('dark');
+          const newTheme = isDark ? 'dark' : 'light';
+          localStorage.setItem('theme', newTheme);
+          updateUI(newTheme);
+        });
+
+        const saved = localStorage.getItem('theme');
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        const theme = saved || (prefersDark ? 'dark' : 'light');
+        updateUI(theme);
+      });
+    </script>
+  </body>
+</html>
