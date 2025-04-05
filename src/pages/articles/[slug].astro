@@ -14,16 +14,44 @@ export async function getStaticPaths() {
 
 // On récupère l’article depuis les props
 const { article } = Astro.props;
----
 
+// Liste de textes aléatoires "Retour à l’accueil"
+const returnLabels = [
+  "☘️ Back to the craic",
+  "← Retour au bercail",
+  "🍀 Slán abhaile",
+  "🏡 Home sweet home",
+  "🌈 Rainbow's end",
+  "← Back to Dublin",
+  "🛤️ Return to the green road"
+];
+const returnLabel = returnLabels[Math.floor(Math.random() * returnLabels.length)];
+---
 
 <Layout>
   <article class="prose prose-lg max-w-3xl mx-auto dark:prose-invert">
-    <h1>{article.data.title}</h1>
+
+    <!-- Titre + bouton retour -->
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-2">
+      <h1 class="text-3xl font-bold">{article.data.title}</h1>
+      <a
+        href="/"
+        class="text-sm px-4 py-2 bg-[#FF883E] text-white rounded-full shadow hover:bg-orange-500 transition whitespace-nowrap flex items-center gap-2 font-medium"
+      >
+        {returnLabel}
+      </a>
+    </div>
+
     <p class="text-sm text-gray-500 mb-4">📅 {article.data.pubDate}</p>
+
     {article.data.cover && (
-      <img src={article.data.cover} alt={article.data.title} class="rounded-xl my-4" />
+      <img
+        src={article.data.cover}
+        alt={article.data.title}
+        class="rounded-xl my-6 w-full max-h-[300px] object-cover"
+      />
     )}
+
     <div innerHTML={article.body} />
   </article>
 </Layout>
