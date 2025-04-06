@@ -1,21 +1,16 @@
 ---
-import { getCollection, getEntryBySlug } from "astro:content";
+import { getCollection } from "astro:content";
 import Layout from "../../layouts/Layout.astro";
 
-// Astro te demande ici la liste des slugs à générer
 export async function getStaticPaths() {
   const articles = await getCollection("articles");
-
   return articles.map((article) => ({
     params: { slug: article.slug },
     props: { article },
   }));
 }
 
-// On récupère l’article depuis les props
 const { article } = Astro.props;
-
-// Liste de textes aléatoires "Retour à l’accueil"
 const returnLabels = [
   "☘️ Back to the craic",
   "← Retour au bercail",
@@ -23,17 +18,15 @@ const returnLabels = [
   "🏡 Home sweet home",
   "🌈 Rainbow's end",
   "← Back to Dublin",
-  "🛤️ Return to the green road"
+  "🛤️ Return to the green road",
 ];
 const returnLabel = returnLabels[Math.floor(Math.random() * returnLabels.length)];
 const { Content } = await article.render();
-
+const slug = article.slug;
 ---
 
 <Layout>
   <article class="prose prose-lg max-w-3xl mx-auto dark:prose-invert">
-
-    <!-- Titre + bouton retour -->
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-2">
       <h1 class="text-3xl font-bold">{article.data.title}</h1>
       <a
@@ -54,51 +47,44 @@ const { Content } = await article.render();
       />
     )}
 
-<Content />
-<hr class="my-8" />
-<section id="comments" class="mt-8">
-  <h2 class="text-2xl font-semibold mb-4">💬 Vos commentaires</h2>
+    <Content />
 
-  <!-- Formulaire -->
-  <form id="comment-form" class="mb-6 space-y-4">
-    <input
-      type="text"
-      id="comment-name"
-      placeholder="Votre prénom"
-      required
-      class="w-full border rounded px-4 py-2"
-    />
-    <textarea
-      id="comment-text"
-      rows="3"
-      placeholder="Votre commentaire"
-      required
-      class="w-full border rounded px-4 py-2"
-    ></textarea>
-    <button
-      type="submit"
-      class="px-4 py-2 bg-[#169B62] text-white rounded hover:bg-green-700 transition"
-    >
-      ✍️ Envoyer
-    </button>
-  </form>
+    <hr class="my-8" />
 
-  <!-- Zone d'affichage -->
-  <ul id="comment-list" class="space-y-4"></ul>
-</section>
+    <!-- Zone de commentaires -->
+    <section id="comments" class="mt-8">
+      <h2 class="text-2xl font-semibold mb-4">💬 Vos commentaires</h2>
 
+      <form id="comment-form" class="mb-6 space-y-4">
+        <input
+          type="text"
+          id="comment-name"
+          placeholder="Votre prénom"
+          required
+          class="w-full border rounded px-4 py-2"
+        />
+        <textarea
+          id="comment-text"
+          rows="3"
+          placeholder="Votre commentaire"
+          required
+          class="w-full border rounded px-4 py-2"
+        ></textarea>
+        <button
+          type="submit"
+          class="px-4 py-2 bg-[#169B62] text-white rounded hover:bg-green-700 transition"
+        >
+          ✍️ Envoyer
+        </button>
+      </form>
+
+      <ul id="comment-list" class="space-y-4"></ul>
+    </section>
   </article>
-</Layout>
-<script>
-  document.addEventListener("DOMContentLoaded", () => {
-    const form = document.getElementById("comment-form");
-    const list = document.getElementById("comment-list");
-    const nameInput = document.getElementById("comment-name");
-    const textInput = document.getElementById("comment-text");
 
-    if (!form || !list) return;
-
-    const key = location.pathname + "_comments";
+  <script is:inline>
+    const SUPABASE_URL = "https://ajbufqljpigkgyxdaygd.supabase.co";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFqYnVmcWxqcGlna2d5eGRheWdkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDMyNjI1MzQsImV4cCI6MjA1ODgzODUzNH0.wnUTiakrSL7mjp3kBAL8-LREAL6USMlpz-TWoSGHXNw"; // remplace par ta vraie clé
 
     const emojis = ["☘️", "🍺", "🌦️", "🐑", "🏰", "🥔", "🎻", "🌈", "🧳", "📷"];
 
@@ -109,46 +95,71 @@ const { Content } = await article.render();
       const minutes = Math.floor(seconds / 60);
       const hours = Math.floor(minutes / 60);
       const days = Math.floor(hours / 24);
-
       if (days > 0) return `il y a ${days} jour${days > 1 ? "s" : ""}`;
       if (hours > 0) return `il y a ${hours}h`;
       if (minutes > 0) return `il y a ${minutes} min`;
       return `à l’instant`;
     }
 
-    function loadComments() {
-      const saved = JSON.parse(localStorage.getItem(key) || "[]");
+    async function loadComments(slug) {
+      const list = document.getElementById("comment-list");
+      const res = await fetch(`${SUPABASE_URL}/rest/v1/comments?slug=eq.${slug}&order=created_at.desc`, {
+        headers: {
+          apikey: SUPABASE_ANON_KEY,
+        },
+      });
+      const comments = await res.json();
       list.innerHTML = "";
-
-      saved.forEach(({ name, text, date, emoji }) => {
+      comments.forEach(({ name, text, created_at }) => {
+        const emoji = emojis[Math.floor(Math.random() * emojis.length)];
         const li = document.createElement("li");
         li.className = "bg-gray-100 dark:bg-gray-700 p-4 rounded shadow";
         li.innerHTML = `
-          <strong class="text-[#169B62]">${emoji || "☘️"} ${name}</strong>
-          <span class="text-sm text-gray-500 float-right">${timeAgo(date)}</span>
+          <strong class="text-[#169B62]">${emoji} ${name}</strong>
+          <span class="text-sm text-gray-500 float-right">${timeAgo(created_at)}</span>
           <p class="mt-2">${text}</p>
         `;
         list.appendChild(li);
       });
     }
 
-    form.addEventListener("submit", (e) => {
-      e.preventDefault();
-      const name = nameInput.value.trim();
-      const text = textInput.value.trim();
-      if (!name || !text) return;
+    document.addEventListener("DOMContentLoaded", () => {
+      const form = document.getElementById("comment-form");
+      const nameInput = document.getElementById("comment-name");
+      const textInput = document.getElementById("comment-text");
+      const slug = location.pathname.split("/").filter(Boolean).pop();
 
-      const emoji = emojis[Math.floor(Math.random() * emojis.length)];
-      const newComment = { name, text, date: new Date().toISOString(), emoji };
-      const existing = JSON.parse(localStorage.getItem(key) || "[]");
-      const updated = [...existing, newComment];
-      localStorage.setItem(key, JSON.stringify(updated));
+      loadComments(slug);
 
-      nameInput.value = "";
-      textInput.value = "";
-      loadComments();
+      form?.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const name = nameInput.value.trim();
+        const text = textInput.value.trim();
+        if (!name || !text) return;
+
+        try {
+          const res = await fetch(`${SUPABASE_URL}/rest/v1/comments`, {
+            method: "POST",
+            headers: {
+              apikey: SUPABASE_ANON_KEY,
+              Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+              "Content-Type": "application/json",
+              Prefer: "return=representation",
+            },
+            body: JSON.stringify({ name, text, slug }),
+          });
+          if (!res.ok) {
+            const err = await res.json();
+            throw new Error("Erreur Supabase : " + JSON.stringify(err));
+          }
+          nameInput.value = "";
+          textInput.value = "";
+          await loadComments(slug);
+        } catch (err) {
+          console.error(err);
+          alert("❌ Erreur : commentaire non envoyé !");
+        }
+      });
     });
-
-    loadComments();
-  });
-</script>
+  </script>
+</Layout>
