@@ -1,0 +1,27 @@
+---
+import { getCollection } from "astro:content";
+import Layout from "../layouts/Layout.astro";
+
+const articles = await getCollection("articles");
+
+// Trie les articles par date décroissante (du plus récent au plus ancien)
+const sortedArticles = articles.sort(
+  (a, b) => new Date(b.data.pubDate) - new Date(a.data.pubDate)
+);
+---
+
+<Layout>
+  <section class="max-w-4xl mx-auto py-8">
+    <h1 class="text-3xl font-bold mb-6">🛠️ Gestion des articles</h1>
+    <ul class="space-y-4">
+      {sortedArticles.map(article => (
+        <li class="border p-4 rounded shadow-sm hover:shadow-md transition">
+          <a href={`/articles/${article.slug}/`} class="text-xl font-semibold text-[#169B62] hover:underline">
+            {article.data.title}
+          </a>
+          <p class="text-sm text-gray-500">Publié le {article.data.pubDate}</p>
+        </li>
+      ))}
+    </ul>
+  </section>
+</Layout>
