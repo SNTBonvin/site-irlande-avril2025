@@ -1,0 +1,90 @@
+---
+import fs from "node:fs/promises";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+import Layout from "../../../layouts/Layout.astro";
+
+export const prerender = false;
+
+const { slug } = Astro.params;
+
+// Chemin du fichier
+const srcDir = path.dirname(fileURLToPath(import.meta.url));
+const filePath = path.resolve(srcDir, "../../../content/articles", `${slug}.md`);
+
+// Traitement du formulaire
+export async function POST({ request, redirect }) {
+  const form = await request.formData();
+  const slug = form.get("slug");
+  const title = form.get("title");
+  const pubDate = form.get("pubDate");
+  const cover = form.get("cover");
+  const album = form.get("album");
+  const body = form.get("body");
+
+  const newContent = `---\ntitle: "${title}"\npubDate: "${pubDate}"\ncover: "${cover}"\nalbum: "${album}"\n---\n\n${body}`;
+
+  try {
+    await fs.writeFile(filePath, newContent, "utf-8");
+    console.log(`✅ Article ${slug} mis à jour`);
+    return redirect("/admin");
+  } catch (err) {
+    console.error("❌ Erreur de sauvegarde :", err);
+    return new Response("Erreur lors de la sauvegarde", { status: 500 });
+  }
+}
+
+// Lecture du fichier pour affichage
+const rawContent = await fs.readFile(filePath, "utf-8");
+const match = rawContent.match(/^---\n([\s\S]+?)\n---\n([\s\S]*)$/);
+const frontmatter = match?.[1] || "";
+const content = match?.[2] || "";
+
+const parseFrontmatter = (fm) => {
+  const result = {};
+  fm.split("\n").forEach((line) => {
+    const [key, ...rest] = line.split(":");
+    result[key.trim()] = rest.join(":").trim().replace(/^\"|\"$/g, "");
+  });
+  return result;
+};
+
+const data = parseFrontmatter(frontmatter);
+---
+
+<Layout>
+  <h1 class="text-2xl font-bold mb-4">✏️ Modifier l’article : {slug}</h1>
+
+  <form method="POST" class="space-y-4">
+    <input type="hidden" name="slug" value={slug} />
+
+    <div>
+      <label class="block font-medium">Titre</label>
+      <input name="title" value={data.title} required class="w-full border px-3 py-2 rounded" />
+    </div>
+
+    <div>
+      <label class="block font-medium">Date de publication</label>
+      <input name="pubDate" value={data.pubDate} required type="date" class="w-full border px-3 py-2 rounded" />
+    </div>
+
+    <div>
+      <label class="block font-medium">Image de couverture (URL)</label>
+      <input name="cover" value={data.cover} class="w-full border px-3 py-2 rounded" />
+    </div>
+
+    <div>
+      <label class="block font-medium">Lien vers l'album photo</label>
+      <input name="album" value={data.album} class="w-full border px-3 py-2 rounded" />
+    </div>
+
+    <div>
+      <label class="block font-medium">Contenu</label>
+      <textarea name="body" rows="10" required class="w-full border px-3 py-2 rounded">{content}</textarea>
+    </div>
+
+    <button type="submit" class="bg-orange-500 text-white px-4 py-2 rounded hover:bg-orange-600">
+      💾 Enregistrer
+    </button>
+  </form>
+</Layout>
