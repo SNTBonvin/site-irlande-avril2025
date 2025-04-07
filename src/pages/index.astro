@@ -3,7 +3,10 @@ import { getCollection } from "astro:content";
 import Layout from "../layouts/Layout.astro";
 import { supabase } from "../lib/supabaseClient";
 
-const articles = await getCollection("articles");
+const articles = (await getCollection("articles")).sort(
+  (a, b) => new Date(b.data.pubDate) - new Date(a.data.pubDate)
+);
+
 
 const { data: counts, error } = await supabase
   .from("comments")
