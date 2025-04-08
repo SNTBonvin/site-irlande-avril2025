@@ -2,11 +2,15 @@
 import { getCollection } from "astro:content";
 import Layout from "../layouts/Layout.astro";
 import { supabase } from "../lib/supabaseClient";
+import { parse } from "cookie";
+
+// (Optionnel) Protection admin via cookie
+// const cookie = Astro.request.headers.get("cookie") || "";
+// const { admin } = parse(cookie);
 
 const articles = (await getCollection("articles")).sort(
   (a, b) => new Date(b.data.pubDate) - new Date(a.data.pubDate)
 );
-
 
 const { data: counts, error } = await supabase
   .from("comments")
@@ -23,7 +27,17 @@ counts?.forEach(({ slug }) => {
 ---
 
 <Layout>
-  <section class="px-4 py-8 max-w-6xl mx-auto">
+  <section class="px-4 py-8 max-w-6xl mx-auto relative">
+    <div class="absolute top-4 right-4">
+      <a
+        href="/admin-login"
+        class="text-sm px-4 py-2 rounded-md bg-[#169B62] text-white hover:bg-green-700 transition"
+        title="Accéder à l’espace admin"
+      >
+        🔐 Connexion
+      </a>
+    </div>
+
     <h1 class="text-4xl font-bold mb-6 text-[#169B62]">🇮🇪 Carnet de route</h1>
 
     <div class="grid sm:grid-cols-2 md:grid-cols-3 gap-6">

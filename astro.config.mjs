@@ -3,6 +3,8 @@ import tailwind from "@astrojs/tailwind";
 import mdx from "@astrojs/mdx";
 import sitemap from "@astrojs/sitemap";
 import dotenv from "dotenv";
+import 'dotenv/config';
+
 
 // 🔐 Charge les variables d’environnement du fichier `.env`
 dotenv.config();

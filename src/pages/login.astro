@@ -1,0 +1,51 @@
+---
+import Layout from "../layouts/Layout.astro";
+---
+
+<Layout>
+  <section class="max-w-md mx-auto py-12">
+    <h1 class="text-2xl font-bold mb-6">🔐 Connexion admin</h1>
+
+    <form id="login-form" class="space-y-4">
+      <input
+        name="email"
+        type="email"
+        placeholder="Email"
+        required
+        class="w-full border px-4 py-2 rounded"
+      />
+      <input
+        name="password"
+        type="password"
+        placeholder="Mot de passe"
+        required
+        class="w-full border px-4 py-2 rounded"
+      />
+      <button
+        type="submit"
+        class="bg-[#169B62] text-white px-4 py-2 rounded hover:bg-green-700 transition"
+      >
+        Connexion
+      </button>
+    </form>
+
+    <script type="module">
+      import { supabase } from "../lib/supabaseClient.js";
+
+      const form = document.getElementById("login-form");
+      form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const email = form.email.value;
+        const password = form.password.value;
+
+        const { error } = await supabase.auth.signInWithPassword({ email, password });
+
+        if (error) {
+          alert("Erreur : " + error.message);
+        } else {
+          window.location.href = "/admin";
+        }
+      });
+    </script>
+  </section>
+</Layout>

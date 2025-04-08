@@ -6,6 +6,8 @@ const articles = await getCollection("articles");
 const sorted = articles.sort(
   (a, b) => new Date(b.data.pubDate) - new Date(a.data.pubDate)
 );
+
+
 ---
 
 <Layout>
