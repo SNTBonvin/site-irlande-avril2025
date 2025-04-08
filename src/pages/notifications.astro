@@ -1,7 +1,7 @@
 ---
 import Layout from "../layouts/Layout.astro";
 import QRCode from "qrcode";
-const topicUrl = "https://notifications.goodwine-walnutgrove.ynh.fr/irlande2025";
+const topicUrl = "https://www.icloud.com/photos/#/icloudlinks/0aaNIX353Y5YFO3C1pzpD9r0Q";
 const qr = await QRCode.toDataURL(topicUrl);
 ---
 
@@ -12,7 +12,7 @@ const qr = await QRCode.toDataURL(topicUrl);
     <p class="mb-4">Pour recevoir une alerte quand un nouvel article est publié :</p>
 
     <ol class="list-decimal list-inside mb-6 space-y-2">
-      <li>Téléchargez l’application <strong>ntfy</strong> sur votre téléphone (Android ou iOS)</li>
+      <li>Téléchargez l’application <strong>ntfy</strong> sur votre téléphone ( <a href="https://play.google.com/store/apps/details?id=io.heckel.ntfy&hl=fr&pli=1" target=”_blank” class="text-green-600 underline">Android</a> ou sur <a href="https://apps.apple.com/fr/app/ntfy/id1625396347" target=”_blank” class="text-green-600 underline">iOS</a>)</li>
       <li>Ouvrez l’application et ajoutez un abonnement avec ces infos :</li>
     </ol>
 
@@ -23,11 +23,12 @@ const qr = await QRCode.toDataURL(topicUrl);
       <p><strong>🔐 Mot de passe :</strong> <code>Irlande2025</code></p>
     </div>
 
-    <p class="mb-2">📷 Vous pouvez aussi scanner ce QR Code :</p>
+    <p class="mb-2">📷 Vous pouvez aussi scanner ce QR Code pour avoir un tutoriel en images :</p>
     <img src={qr} alt="QR Code pour irlande2025" class="w-48 h-48 mx-auto" />
 
     <p class="text-sm text-gray-500 mt-6">
       (Cette page est publique. Ne partagez ces identifiants qu'avec vos proches.)
     </p>
   </section>
+ 
 </Layout>
