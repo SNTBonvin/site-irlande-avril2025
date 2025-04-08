@@ -1,0 +1,33 @@
+---
+import Layout from "../layouts/Layout.astro";
+import QRCode from "qrcode";
+const topicUrl = "https://notifications.goodwine-walnutgrove.ynh.fr/irlande2025";
+const qr = await QRCode.toDataURL(topicUrl);
+---
+
+<Layout>
+  <section class="max-w-2xl mx-auto py-12">
+    <h1 class="text-3xl font-bold mb-4">📲 Abonnez-vous aux notifications</h1>
+
+    <p class="mb-4">Pour recevoir une alerte quand un nouvel article est publié :</p>
+
+    <ol class="list-decimal list-inside mb-6 space-y-2">
+      <li>Téléchargez l’application <strong>ntfy</strong> sur votre téléphone (Android ou iOS)</li>
+      <li>Ouvrez l’application et ajoutez un abonnement avec ces infos :</li>
+    </ol>
+
+    <div class="bg-gray-100 p-4 rounded mb-6">
+      <p><strong>📝 Topic :</strong> <code>irlande2025</code></p>
+      <p><strong>🌐 Serveur :</strong> <code>https://notifications.goodwine-walnutgrove.ynh.fr</code></p>
+      <p><strong>👤 Identifiant :</strong> <code>famille5962</code></p>
+      <p><strong>🔐 Mot de passe :</strong> <code>Irlande2025</code></p>
+    </div>
+
+    <p class="mb-2">📷 Vous pouvez aussi scanner ce QR Code :</p>
+    <img src={qr} alt="QR Code pour irlande2025" class="w-48 h-48 mx-auto" />
+
+    <p class="text-sm text-gray-500 mt-6">
+      (Cette page est publique. Ne partagez ces identifiants qu'avec vos proches.)
+    </p>
+  </section>
+</Layout>
