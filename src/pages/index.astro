@@ -1,67 +1,82 @@
 ---
-import { getCollection } from "astro:content";
-import Layout from "../layouts/Layout.astro";
-import { supabase } from "../lib/supabaseClient";
-import { parse } from "cookie";
-
-// (Optionnel) Protection admin via cookie
-// const cookie = Astro.request.headers.get("cookie") || "";
-// const { admin } = parse(cookie);
-
-const articles = (await getCollection("articles")).sort(
-  (a, b) => new Date(b.data.pubDate) - new Date(a.data.pubDate)
-);
-
-const { data: counts, error } = await supabase
-  .from("comments")
-  .select("slug", { count: "exact", head: false });
-
-if (error) {
-  console.warn("Erreur Supabase :", error.message);
-}
-
-const commentCounts = {};
-counts?.forEach(({ slug }) => {
-  commentCounts[slug] = (commentCounts[slug] || 0) + 1;
-});
+import Layout from '../layouts/Layout.astro';
 ---
 
-<Layout>
-  <section class="px-4 py-8 max-w-6xl mx-auto relative">
-    <div class="absolute top-4 right-4">
-      <a
-        href="/admin-login"
-        class="text-sm px-4 py-2 rounded-md bg-[#169B62] text-white hover:bg-green-700 transition"
-        title="Accéder à l’espace admin"
-      >
-        🔐 Connexion
-      </a>
-    </div>
+<Layout title="Accueil">
+  <div class="max-w-6xl mx-auto">
+    <!-- Bloc de présentation + image -->
+    <div class="grid md:grid-cols-2 gap-8 mb-12 items-center">
+      <!-- Texte -->
+      <div class="space-y-6">
+        <h1 class="text-4xl font-bold text-[#169B62]">Notre voyage en Irlande</h1>
+        
+        <div class="prose text-gray-700 dark:text-gray-300">
+          <p class="text-lg">
+            Bienvenue sur notre blog de voyage ! Notre famille s'apprête à partir pour une petit roadtrip
+             en Irlande. Durant cette semaine, nous allons explorer cette île magnifique, 
+            de Dublin à Cork en passant par les paysages spectaculaires de la côte ouest.
+          </p>
+          <p class="text-lg">
+            Nous partagerons ici nos découvertes, nos coups de cœur et nos photos pour vous faire 
+            vivre cette expérience avec nous. Des châteaux médiévaux aux falaises vertigineuses, 
+            en passant par les pubs traditionnels, suivez notre périple à travers l'île d'émeraude !
+          </p>
+        </div>
 
-    <h1 class="text-4xl font-bold mb-6 text-[#169B62]">🇮🇪 Carnet de route</h1>
-
-    <div class="grid sm:grid-cols-2 md:grid-cols-3 gap-6">
-      {articles.map((article) => (
-        <a
-          href={`/articles/${article.slug}/`}
-          class="border rounded-xl overflow-hidden shadow hover:shadow-lg transition bg-white dark:bg-gray-800"
-        >
-          {article.data.cover && (
-            <img
-              src={article.data.cover}
-              alt={article.data.title}
-              class="w-full h-48 object-cover"
-            />
-          )}
-          <div class="p-4">
-            <h2 class="text-xl font-semibold mb-2">{article.data.title}</h2>
-            <p class="text-sm text-gray-500 mb-2">📅 {article.data.pubDate}</p>
-            <p class="text-sm text-gray-500">
-              💬 {commentCounts[article.slug] || 0} commentaire{commentCounts[article.slug] === 1 ? "" : "s"}
-            </p>
-          </div>
+        <a href="/journal" class="inline-block bg-[#169B62] text-white px-6 py-3 rounded-lg hover:bg-green-700 transition-colors">
+          Lire notre journal de bord →
         </a>
-      ))}
+      </div>
+
+      <!-- Image -->
+      <div class="flex items-center justify-center">
+        <div class="relative w-full max-w-md">
+          <div class="absolute inset-0 bg-[#169B62]/20 rounded-lg transform rotate-3"></div>
+          <img
+            src="/images/portrait.jpg"
+            alt="Notre famille"
+            class="relative rounded-lg shadow-xl w-full h-auto"
+          />
+        </div>
+      </div>
     </div>
-  </section>
+
+    <!-- Carte + météo -->
+    <div class="grid md:grid-cols-2 gap-8">
+      <!-- Carte -->
+      <div>
+        <h2 class="text-2xl font-semibold text-[#169B62] mb-4">Notre itinéraire</h2>
+        <iframe
+          src="https://umap.openstreetmap.fr/fr/map/test-irlande_1204758?scaleControl=false&miniMap=false&scrollWheelZoom=true&zoomControl=true&editMode=disabled&moreControl=false&searchControl=null&tilelayersControl=null&embedControl=null&datalayersControl=null&onLoadPanel=none&captionBar=false&captionMenus=false&captionControl=null"
+          width="100%"
+          height="400"
+          class="rounded shadow"
+        ></iframe>
+      </div>
+
+      <!-- Météo -->
+      <div>
+        <h2 class="text-2xl font-semibold text-[#169B62] mb-4">Informations en direct</h2>
+        <div class="bg-white dark:bg-gray-800 p-6 rounded shadow">
+          <p class="text-lg font-semibold">Heure locale à Dublin</p>
+          <p id="clock" class="text-3xl font-mono my-2">--:--:--</p>
+          <p class="text-lg font-semibold">Météo actuelle à Dublin</p>
+          <p id="weather" class="text-md mt-2">Chargement...</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    setInterval(() => {
+      const now = new Date().toLocaleTimeString("fr-FR", { hour12: false, timeZone: "Europe/Dublin" });
+      document.getElementById("clock").textContent = now;
+    }, 1000);
+
+    fetch("https://wttr.in/Dublin?format=%t+%C+\nVent:+%w")
+      .then((res) => res.text())
+      .then((text) => {
+        document.getElementById("weather").textContent = text.trim();
+      });
+  </script>
 </Layout>

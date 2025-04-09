@@ -1,93 +1,65 @@
 ---
-import "../styles/global.css";
+interface Props {
+  title?: string;
+}
+
+const { title = "Voyage en Irlande" } = Astro.props;
 ---
 
+<!DOCTYPE html>
 <html lang="fr">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Voyage en Irlande 2025</title>
+    <meta name="generator" content={Astro.generator} />
+    <title>{title}</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <style is:global>
+      :root {
+        --primary-color: #169B62;
+        --secondary-color: #FF883E;
+        --bg-color: #f9fafb;
+        --text-color: #111827;
+      }
 
-    <!-- ⚡ Initialisation immédiate du thème (évite clignotement) -->
-    <script is:inline>
-      (() => {
-        const theme = localStorage.getItem('theme') ||
-          (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
-        if (theme === 'dark') {
-          document.documentElement.classList.add('dark');
-        } else {
-          document.documentElement.classList.remove('dark');
-        }
-      })();
-    </script>
+      body {
+        background-color: var(--bg-color);
+        color: var(--text-color);
+        font-family: system-ui, sans-serif;
+      }
+
+      a {
+        text-decoration: none;
+        color: inherit;
+      }
+
+      a:hover {
+        color: var(--secondary-color);
+      }
+    </style>
   </head>
-
-  <body class="bg-[#eaf4ec] text-gray-800 font-sans transition-colors duration-300 dark:bg-gray-900 dark:text-white">
-    
-    <header class="bg-[#169B62] text-white py-6 px-6">
-      <div class="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
-        
-        <!-- Titre cliquable sans soulignement -->
-        <a href="/" class="text-4xl font-bold no-underline hover:no-underline focus:outline-none">
-          🇮🇪 Carnet de voyage en Irlande 2025 🇮🇪
-        </a>
-    
-        <!-- Bouton thème clair/sombre -->
-        <button
-          id="theme-toggle"
-          class="px-4 py-2 bg-white text-[#169B62] font-semibold rounded shadow hover:bg-gray-100 transition cursor-pointer flex items-center gap-2"
-        >
-          <span id="theme-icon">🌙</span>
-          <span id="theme-text">Activer le mode sombre</span>
-        </button>
-    
-      </div>
+  <body class="min-h-screen flex flex-col">
+    <header class="bg-[#169B62] text-white shadow-md">
+      <nav class="container mx-auto px-4 py-3">
+        <div class="flex justify-between items-center">
+          <a href="/" class="text-2xl font-bold">Voyage en Irlande</a>
+          <div class="space-x-6 font-semibold">
+            <a href="/" class="hover:text-[#FF883E]">Accueil</a>
+            <a href="/journal" class="hover:text-[#FF883E]">Journal</a>
+            <a href="/notifications" class="hover:text-[#FF883E]">Notifications</a>
+            <a href="/admin-login" class="hover:text-[#FF883E]">Connexion</a>
+          </div>
+        </div>
+      </nav>
     </header>
     
-    
 
-    <main class="p-6 max-w-6xl mx-auto">
+    <main class="flex-grow container mx-auto px-4 py-8">
       <slot />
     </main>
 
-    <footer class="bg-[#169B62] text-white text-center py-4 mt-8">
-      <p>&copy; 2025 - GoodWine en Irlande ☘️</p>
+    <footer class="bg-[#169B62] text-white py-6 text-center">
+      <p>&copy; {new Date().getFullYear()} - Propulsé par GoodWine Family</p>
     </footer>
-
-    <!-- 🌓 Script de bascule thème -->
-   <!-- SCRIPT DE MODE SOMBRE -->
-<script>
-  window.addEventListener('DOMContentLoaded', () => {
-    const toggle = document.getElementById('theme-toggle');
-    const icon = document.getElementById('theme-icon');
-    const text = document.getElementById('theme-text');
-
-    function updateUI(theme) {
-      if (theme === 'dark') {
-        icon.textContent = '☀️';
-        text.textContent = 'Activer le mode clair';
-        document.documentElement.classList.add('dark');
-      } else {
-        icon.textContent = '🌙';
-        text.textContent = 'Activer le mode sombre';
-        document.documentElement.classList.remove('dark');
-      }
-    }
-
-    toggle.addEventListener('click', () => {
-      const isDark = document.documentElement.classList.toggle('dark');
-      const newTheme = isDark ? 'dark' : 'light';
-      localStorage.setItem('theme', newTheme);
-      updateUI(newTheme);
-    });
-
-    const saved = localStorage.getItem('theme');
-    const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    const theme = saved || (systemPrefersDark ? 'dark' : 'light');
-    updateUI(theme);
-  });
-</script>
-
-
   </body>
 </html>
