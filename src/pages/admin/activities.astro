@@ -1,0 +1,84 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import { createClient } from "@supabase/supabase-js";
+
+const supabase = createClient(
+  import.meta.env.PUBLIC_SUPABASE_URL,
+  import.meta.env.PUBLIC_SUPABASE_ANON_KEY
+);
+
+const { data: activities, error } = await supabase
+  .from("points")
+  .select("*")
+  .order("pubDate", { ascending: false });
+
+if (error) {
+  console.error("Erreur Supabase :", error.message);
+}
+---
+
+<Layout>
+  <section class="max-w-4xl mx-auto py-8">
+    <h1 class="text-3xl font-bold mb-6">📍 Activités enregistrées</h1>
+
+    {activities.length === 0 ? (
+      <p>Aucune activité enregistrée.</p>
+    ) : (
+      <ul class="space-y-4">
+        {activities.map((activity) => (
+          <li class="border p-4 rounded shadow flex justify-between items-start gap-4">
+            <div>
+              <div class="font-semibold text-lg">{activity.title}</div>
+              <div class="text-gray-600 text-sm">{activity.activity} - {activity.place}</div>
+              <div class="text-gray-500 text-sm">📅 {activity.pubDate}</div>
+              <div class="text-gray-500 text-sm">🧭 {activity.lat}, {activity.lng}</div>
+            </div>
+            <button
+              class="text-red-600 hover:underline delete-btn"
+              data-id={activity.id}
+              type="button"
+            >
+              Supprimer
+            </button>
+          </li>
+        ))}
+      </ul>
+    )}
+  </section>
+
+  <script is:inline>
+    document.addEventListener("DOMContentLoaded", () => {
+      document.querySelectorAll(".delete-btn").forEach((btn) => {
+        btn.addEventListener("click", async () => {
+          const id = btn.dataset.id;
+          console.log("🔍 ID cliqué :", id);
+          
+          if (!id) return alert("❌ ID introuvable.");
+          if (!confirm("❌ Supprimer cette activité ?")) return;
+
+          try {
+            const res = await fetch("/admin/delete-activity", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json"
+              },
+              body: JSON.stringify({ id })
+            });
+
+            if (res.ok) {
+              alert("✅ Activité supprimée !");
+              location.reload();
+            } else {
+              const msg = await res.text();
+              console.error("❌ Erreur suppression :", msg);
+              alert("❌ Erreur lors de la suppression.");
+            }
+          } catch (e) {
+            console.error("❌ Erreur réseau :", e);
+            alert("❌ Erreur de communication avec le serveur.");
+          }
+        });
+      });
+    });
+  </script>
+</Layout>

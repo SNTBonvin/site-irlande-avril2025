@@ -1,47 +1,43 @@
 ---
 import Layout from "../layouts/Layout.astro";
 import { getCollection } from "astro:content";
+import { formatDate } from "../utils/date.js";
 
 const articles = await getCollection("articles");
-const sorted = articles.sort(
-  (a, b) => new Date(b.data.pubDate) - new Date(a.data.pubDate)
-);
-
-
 ---
-
 <Layout>
-  <section class="max-w-4xl mx-auto py-10">
-    <h1 class="text-3xl font-bold mb-6">🛠️ Administration des articles</h1>
+  <section class="max-w-4xl mx-auto py-8">
+    <h1 class="text-3xl font-bold mb-6">🎛️ Administration</h1>
 
-    <div class="mb-6">
-      <a
-        href="/admin/new"
-        class="bg-[#169B62] text-white px-4 py-2 rounded hover:bg-green-700 transition"
-      >
-        ➕ Nouvel article
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+      <a href="/admin/new" class="block bg-[#169B62] text-white p-6 rounded shadow hover:bg-green-700 transition">
+        ✍️ Publier un nouvel article
+      </a>
+      <a href="/admin/activity" class="block bg-[#169B62] text-white p-6 rounded shadow hover:bg-green-700 transition">
+        📍 Ajouter une activité du jour
+      </a>
+      <a href="/admin/activities" class="block bg-[#169B62] text-white p-6 rounded shadow hover:bg-green-700 transition">
+        🗺️ Voir toutes les activités
       </a>
     </div>
 
+    <h2 class="text-2xl font-bold mb-4">📰 Articles publiés</h2>
     <ul class="space-y-4">
-      {sorted.map(({ slug, data }) => (
-        <li class="border p-4 rounded-md shadow-md">
-          <h2 class="text-xl font-semibold">{data.title}</h2>
-          <p class="text-sm text-gray-500">📅 {data.pubDate}</p>
-          <div class="mt-2">
-            <form
-              method="POST"
-              action={`/admin/delete/${slug}`}
-              onsubmit="return confirm('Confirmer la suppression de cet article ?')"
-            >
-              <button
-                type="submit"
-                class="text-red-600 hover:underline"
-              >
-                🗑️ Supprimer
-              </button>
-            </form>
+      {articles.map(({ slug, data }) => (
+        <li class="p-4 border rounded shadow flex justify-between items-center">
+          <div>
+            <div class="font-semibold text-lg">{data.title}</div>
+            <div class="text-gray-500 text-sm">📅 {formatDate(data.pubDate)}</div>
+            <a href={`/articles/${slug}`} class="text-green-700 hover:underline">🔗 Voir l’article</a>
+
+
           </div>
+          <form method="POST" action={`/admin/delete/${slug}`}>
+            <button type="submit" class="text-red-600 hover:underline" onclick="return confirm('Supprimer cet article ?')">
+              🗑️ Supprimer
+            </button>
+          </form>
+
         </li>
       ))}
     </ul>

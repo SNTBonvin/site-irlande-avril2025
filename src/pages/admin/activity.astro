@@ -1,0 +1,86 @@
+---
+import Layout from "../../layouts/Layout.astro";
+---
+
+<Layout>
+  <section class="max-w-3xl mx-auto py-8">
+    <h1 class="text-3xl font-bold mb-6">📍 Ajouter une activité du jour</h1>
+    <form method="POST" action="/admin/activity-post" class="space-y-6">
+      <div>
+        <label class="block font-medium">Titre de l’activité :</label>
+        <input name="title" required class="w-full border px-4 py-2 rounded" />
+      </div>
+
+      <div>
+        <label class="block font-medium">Adresse ou lieu :</label>
+        <input name="place" class="w-full border px-4 py-2 rounded" />
+      </div>
+
+      <div>
+        <label class="block font-medium">Date :</label>
+        <input name="pubDate" type="date" required class="w-full border px-4 py-2 rounded" />
+      </div>
+
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <label class="block font-medium">Latitude :</label>
+          <input name="latitude" id="latitude" class="w-full border px-4 py-2 rounded" />
+        </div>
+        <div>
+          <label class="block font-medium">Longitude :</label>
+          <input name="longitude" id="longitude" class="w-full border px-4 py-2 rounded" />
+        </div>
+      </div>
+
+      <button
+        type="button"
+        id="locateBtn"
+        class="inline-block bg-[#169B62] text-white px-6 py-2 rounded hover:bg-green-700 transition"
+      >
+        📡 Utiliser ma position actuelle
+      </button>
+
+      <div>
+        <label class="block font-medium">Type d’activité :</label>
+        <select name="activity" required class="w-full border px-4 py-2 rounded">
+          <option value="">Sélectionner</option>
+          <option value="logement">🏠 Logement</option>
+          <option value="restauration">🍽️ Restauration</option>
+          <option value="visite">🗺️ Visite</option>
+          <option value="autre">🔖 Autre</option>
+        </select>
+      </div>
+
+      <button
+        type="submit"
+        class="bg-[#169B62] text-white px-6 py-2 rounded hover:bg-green-700 transition"
+      >
+        ➕ Ajouter l’activité
+      </button>
+    </form>
+  </section>
+
+  <script type="text/javascript">
+    document.addEventListener("DOMContentLoaded", () => {
+      const locateBtn = document.getElementById("locateBtn");
+
+      locateBtn?.addEventListener("click", () => {
+        if (!navigator.geolocation) {
+          alert("La géolocalisation n’est pas supportée par votre navigateur.");
+          return;
+        }
+
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            document.getElementById("latitude").value = position.coords.latitude.toFixed(6);
+            document.getElementById("longitude").value = position.coords.longitude.toFixed(6);
+          },
+          (error) => {
+            alert("Erreur de localisation : " + error.message);
+          }
+        );
+      });
+    });
+  </script>
+  
+</Layout>

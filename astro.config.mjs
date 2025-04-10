@@ -3,6 +3,7 @@ import tailwind from "@astrojs/tailwind";
 import mdx from "@astrojs/mdx";
 import sitemap from "@astrojs/sitemap";
 import dotenv from "dotenv";
+import react from "@astrojs/react";
 import 'dotenv/config';
 
 
@@ -10,7 +11,7 @@ import 'dotenv/config';
 dotenv.config();
 
 export default defineConfig({
-  integrations: [tailwind(), mdx(), sitemap()],
+  integrations: [tailwind(), mdx(), sitemap(), react()],
   vite: {
     define: {
       // 🔐 Injecte la variable dans le bundle côté client

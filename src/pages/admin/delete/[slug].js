@@ -5,7 +5,6 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
-// Obtenir le chemin absolu du dossier /src
 const srcDir = path.dirname(fileURLToPath(import.meta.url));
 const contentDir = path.resolve(srcDir, "../../../content/articles");
 
@@ -24,7 +23,6 @@ export async function POST({ params, redirect }) {
   }
 }
 
-// Gère un accès direct en GET pour éviter une 404
 export function GET() {
   return new Response(null, {
     status: 302,

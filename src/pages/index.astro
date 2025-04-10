@@ -1,5 +1,7 @@
 ---
-import Layout from '../layouts/Layout.astro';
+// src/pages/index.astro
+import Layout from "../layouts/Layout.astro";
+import Map from "../components/Map.jsx";
 ---
 
 <Layout title="Accueil">
@@ -13,7 +15,7 @@ import Layout from '../layouts/Layout.astro';
         <div class="prose text-gray-700 dark:text-gray-300">
           <p class="text-lg">
             Bienvenue sur notre blog de voyage ! Notre famille s'apprête à partir pour une petit roadtrip
-             en Irlande. Durant cette semaine, nous allons explorer cette île magnifique, 
+            en Irlande. Durant cette semaine, nous allons explorer cette île magnifique, 
             de Dublin à Cork en passant par les paysages spectaculaires de la côte ouest.
           </p>
           <p class="text-lg">
@@ -42,26 +44,23 @@ import Layout from '../layouts/Layout.astro';
     </div>
 
     <!-- Carte + météo -->
-    <div class="grid md:grid-cols-2 gap-8">
+    <div class="grid md:grid-cols-2 gap-8 items-start">
       <!-- Carte -->
       <div>
         <h2 class="text-2xl font-semibold text-[#169B62] mb-4">Notre itinéraire</h2>
-        <iframe
-          src="https://umap.openstreetmap.fr/fr/map/test-irlande_1204758?scaleControl=false&miniMap=false&scrollWheelZoom=true&zoomControl=true&editMode=disabled&moreControl=false&searchControl=null&tilelayersControl=null&embedControl=null&datalayersControl=null&onLoadPanel=none&captionBar=false&captionMenus=false&captionControl=null"
-          width="100%"
-          height="400"
-          class="rounded shadow"
-        ></iframe>
+        <Map client:only="react" />
       </div>
 
       <!-- Météo -->
-      <div>
-        <h2 class="text-2xl font-semibold text-[#169B62] mb-4">Informations en direct</h2>
-        <div class="bg-white dark:bg-gray-800 p-6 rounded shadow">
+      
+      <div class="bg-white dark:bg-gray-800 p-6 rounded shadow h-full flex flex-col justify-between">
+        <div>
+          <h2 class="text-2xl font-semibold text-[#169B62] mb-4">Informations locales</h2>
           <p class="text-lg font-semibold">Heure locale à Dublin</p>
-          <p id="clock" class="text-3xl font-mono my-2">--:--:--</p>
-          <p class="text-lg font-semibold">Météo actuelle à Dublin</p>
-          <p id="weather" class="text-md mt-2">Chargement...</p>
+          <p id="clock" class="text-3xl font-mono my-4">--:--:--</p>
+          <p class="text-lg font-semibold mt-6">Météo actuelle à Dublin</p>
+          <p id="weather-desc" class="text-md mt-2">Chargement...</p>
+          <p id="weather-wind" class="text-sm text-gray-500 mt-1"></p>
         </div>
       </div>
     </div>
@@ -69,14 +68,23 @@ import Layout from '../layouts/Layout.astro';
 
   <script>
     setInterval(() => {
-      const now = new Date().toLocaleTimeString("fr-FR", { hour12: false, timeZone: "Europe/Dublin" });
+      const now = new Date().toLocaleTimeString("fr-FR", {
+        hour12: false,
+        timeZone: "Europe/Dublin"
+      });
       document.getElementById("clock").textContent = now;
     }, 1000);
 
-    fetch("https://wttr.in/Dublin?format=%t+%C+\nVent:+%w")
+    fetch("https://wttr.in/Dublin?format=%t+%C+Vent:+%w")
       .then((res) => res.text())
       .then((text) => {
-        document.getElementById("weather").textContent = text.trim();
+        const parts = text.trim().split(" ");
+        const temp = parts[0] || "";
+        const condition = parts.slice(1, -2).join(" ") || "";
+        const wind = parts.slice(-1)[0] || "";
+
+        document.getElementById("weather-desc").textContent = `${temp} ${condition}`;
+        document.getElementById("weather-wind").textContent = `Vent : ${wind}`;
       });
   </script>
 </Layout>
