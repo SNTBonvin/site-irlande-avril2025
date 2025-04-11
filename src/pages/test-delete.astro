@@ -1,0 +1,27 @@
+---
+// src/pages/test-delete.astro
+import { createClient } from "@supabase/supabase-js";
+const supabase = createClient(
+  import.meta.env.PUBLIC_SUPABASE_URL,
+  import.meta.env.PUBLIC_SUPABASE_ANON_KEY
+);
+---
+
+<h1>Test suppression</h1>
+<button onclick="testDelete()">🧪 Supprimer test</button>
+
+<script type="module" is:inline>
+  async function testDelete() {
+    const res = await fetch("/api/delete-activity", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ id: "e2e22533-22cc-4d57-b81d-14c4f7e8405c" })  // 🔁 Remplace par un vrai ID existant
+    });
+
+    const txt = await res.text();
+    console.log("Réponse :", res.status, txt);
+    alert(txt);
+  }
+</script>

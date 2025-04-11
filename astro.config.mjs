@@ -2,19 +2,17 @@ import { defineConfig } from "astro/config";
 import tailwind from "@astrojs/tailwind";
 import mdx from "@astrojs/mdx";
 import sitemap from "@astrojs/sitemap";
-import dotenv from "dotenv";
 import react from "@astrojs/react";
+import dotenv from "dotenv";
 import 'dotenv/config';
 
-
-// 🔐 Charge les variables d’environnement du fichier `.env`
 dotenv.config();
 
 export default defineConfig({
+  output: "static", // ✅ indique à Astro de générer un site 100% statique
   integrations: [tailwind(), mdx(), sitemap(), react()],
   vite: {
     define: {
-      // 🔐 Injecte la variable dans le bundle côté client
       'import.meta.env.GITHUB_TOKEN': JSON.stringify(process.env.GITHUB_TOKEN)
     }
   }

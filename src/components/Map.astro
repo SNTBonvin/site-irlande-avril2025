@@ -1,0 +1,35 @@
+---
+import { onMount } from "astro/client";
+import "leaflet/dist/leaflet.css";
+---
+
+<div id="map" class="w-full h-[400px] rounded shadow"></div>
+
+<script type="module">
+  import L from "leaflet";
+  import { createClient } from "@supabase/supabase-js";
+
+  const supabase = createClient(
+    import.meta.env.PUBLIC_SUPABASE_URL,
+    import.meta.env.PUBLIC_SUPABASE_ANON_KEY
+  );
+
+  onMount(async () => {
+    const map = L.map("map").setView([53.3498, -6.2603], 6); // Centre sur l'Irlande
+
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      attribution: '&copy; OpenStreetMap contributors',
+    }).addTo(map);
+
+    const { data: points, error } = await supabase.from("points").select("*");
+    if (error) {
+      console.error("Erreur Supabase :", error);
+      return;
+    }
+
+    points.forEach((point) => {
+      const marker = L.marker([point.lat, point.lng]).addTo(map);
+      marker.bindPopup(`<strong>${point.title}</strong><br>${point.date}<br>${point.place}`);
+    });
+  });
+</script>
